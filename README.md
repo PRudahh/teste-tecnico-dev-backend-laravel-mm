@@ -16,8 +16,8 @@ Com PHP, Composer e MySQL prontos, agora é só seguir os passos abaixo.
 ### Passo 1 — Clone o repositório
 
 ```bash
-git clone https://github.com/seu-usuario/agency-system.git
-cd agency-system
+git clone https://github.com/PRudahh/teste-tecnico-dev-backend-laravel-mm
+cd agency-system-tecnical-test
 ```
 
 ### Passo 2 — Instale as dependências
@@ -97,7 +97,7 @@ Usuários criados: admin@agency.com, financeiro@agency.com, operacional@agency.c
 O sistema usa filas para processar jobs em segundo plano (como aplicação automática de crédito em cobranças). Abra um **segundo terminal**, entre na pasta do projeto e rode:
 
 ```bash
-cd agency-system
+cd agency-system-tecnical-test
 php artisan queue:work --tries=4
 ```
 
@@ -123,7 +123,7 @@ O projeto inclui uma Postman Collection completa com todos os endpoints já conf
 
 1. Baixe e instale o [Postman](https://www.postman.com/downloads/) se ainda não tiver
 2. Abra o Postman e clique em **Import**
-3. Selecione o arquivo `agency-system.postman_collection.json` na raiz do projeto
+3. Selecione o arquivo `agency-system-tecnical-test.postman_collection.json` na raiz do projeto
 4. A collection vai aparecer com todos os endpoints organizados por categoria (Auth, Dashboard, Cobranças, Clientes, etc.)
 
 **Para começar:** rode primeiro a requisição **Auth > Login**. O Postman já está configurado para capturar o token retornado e salvá-lo automaticamente na variável `{{token}}` — todas as outras requisições já usam esse token, então você não precisa copiar nada manualmente.
