@@ -202,18 +202,18 @@ Tests:  20 passed
 
 | Método | Rota | Descrição | Restrição |
 |---|---|---|---|
+| GET | /api/v1/auth/me | Dados do usuário logado (*REQUISITO) | — |
+| GET | /api/v1/cobrancas | Listar cobranças com filtros e paginação (*REQUISITO) | Rate limit: 20/min |
+| POST | /api/v1/clientes/{id}/aplicar-credito | Aplicar crédito manual (*REQUISITO) | Financeiro / Admin |
 | POST | /api/v1/auth/login | Login | Pública |
 | POST | /api/v1/auth/logout | Logout | — |
-| GET | /api/v1/auth/me | Dados do usuário logado | — |
 | GET | /api/v1/dashboard | Dashboard financeiro consolidado (cache 5min) | — |
-| GET | /api/v1/cobrancas | Listar cobranças com filtros e paginação | Rate limit: 20/min |
 | PATCH | /api/v1/cobrancas/{id}/status | Mudar status de uma cobrança | — |
 | GET | /api/v1/clientes | Listar clientes | — |
 | POST | /api/v1/clientes | Criar cliente | — |
 | GET | /api/v1/clientes/{id} | Ver cliente com contratos | — |
 | PUT | /api/v1/clientes/{id} | Atualizar cliente | — |
 | DELETE | /api/v1/clientes/{id} | Remover cliente | — |
-| POST | /api/v1/clientes/{id}/aplicar-credito | Aplicar crédito manual | Financeiro / Admin |
 | GET | /api/v1/contratos | Listar contratos | — |
 | POST | /api/v1/contratos | Criar contrato com itens | — |
 | GET | /api/v1/contratos/{id} | Ver contrato completo | — |

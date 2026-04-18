@@ -1,0 +1,264 @@
+{
+  "info": {
+    "name": "Agency System API",
+    "description": "Coleção completa da API do sistema de gestão de contratos recorrentes para agências digitais.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000/api/v1", "type": "string" },
+    { "key": "token",    "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.token) { pm.collectionVariables.set('token', res.token); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"financeiro@agency.com\",\n  \"password\": \"password\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/logout",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Accept", "value": "application/json" }]
+          }
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/auth/me",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Accept", "value": "application/json" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Dashboard financeiro",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/dashboard",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Accept", "value": "application/json" }],
+            "description": "Retorna dados consolidados: faturamento mês atual vs anterior, total em aberto, inadimplente, top 5 clientes e distribuição de OS. Cache de 5 minutos, invalidado ao mudar status de cobrança."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cobranças",
+      "item": [
+        {
+          "name": "Listar cobranças",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/cobrancas",
+              "host": ["{{base_url}}"],
+              "path": ["cobrancas"],
+              "query": [
+                { "key": "status[]",    "value": "pendente",    "disabled": true },
+                { "key": "status[]",    "value": "aguardando_pagamento", "disabled": true },
+                { "key": "data_inicio", "value": "2025-01-01",  "disabled": true },
+                { "key": "data_fim",    "value": "2025-12-31",  "disabled": true },
+                { "key": "busca",       "value": "Alpha",       "disabled": true },
+                { "key": "order_by",    "value": "data_vencimento", "disabled": true },
+                { "key": "order_dir",   "value": "asc",         "disabled": true },
+                { "key": "per_page",    "value": "20",          "disabled": true },
+                { "key": "page",        "value": "1",           "disabled": true }
+              ]
+            },
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Accept", "value": "application/json" }],
+            "description": "Filtros: status[] (múltiplos), data_inicio, data_fim, busca (nome/documento cliente). Ordenação com whitelist. Paginação por cursor (padrão) ou offset com ?page=N. Rate limit: 20 req/min."
+          }
+        },
+        {
+          "name": "Mudar status da cobrança",
+          "request": {
+            "method": "PATCH",
+            "url": "{{base_url}}/cobrancas/1/status",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"aguardando_pagamento\"\n}"
+            },
+            "description": "Fluxo: pendente → aguardando_pagamento → pago/pago_parcial/inadimplente/cancelado. Transições inválidas retornam 422. Cancelamento exige motivo_cancelamento."
+          }
+        },
+        {
+          "name": "Cancelar cobrança (com motivo)",
+          "request": {
+            "method": "PATCH",
+            "url": "{{base_url}}/cobrancas/1/status",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"cancelado\",\n  \"motivo_cancelamento\": \"Cliente encerrou o contrato antecipadamente.\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Clientes",
+      "item": [
+        {
+          "name": "Listar clientes",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/clientes",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Accept", "value": "application/json" }]
+          }
+        },
+        {
+          "name": "Criar cliente",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/clientes",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Nova Empresa Ltda\",\n  \"documento\": \"33.444.555/0001-66\",\n  \"email\": \"contato@novaempresa.com\",\n  \"telefone\": \"(84) 99999-0001\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Ver cliente",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/clientes/1",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Accept", "value": "application/json" }]
+          }
+        },
+        {
+          "name": "Aplicar crédito (financeiro/admin)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/clientes/1/aplicar-credito",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"valor\": 350.00\n}"
+            },
+            "description": "Apenas role financeiro ou admin. Valor deve ser > 0. Dispara job assíncrono para aplicar crédito nas cobranças pendentes (mais antiga primeiro)."
+          }
+        },
+        {
+          "name": "Aplicar crédito — erro valor zero (422)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/clientes/1/aplicar-credito",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"valor\": 0\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Contratos",
+      "item": [
+        {
+          "name": "Listar contratos",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/contratos",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Accept", "value": "application/json" }]
+          }
+        },
+        {
+          "name": "Criar contrato com itens",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/contratos",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cliente_id\": 1,\n  \"descricao\": \"Contrato de Marketing Digital\",\n  \"data_inicio\": \"2025-01-01\",\n  \"dia_vencimento\": 10,\n  \"itens\": [\n    { \"descricao\": \"Gestão de tráfego\", \"quantidade\": 1, \"valor_unitario\": 1500.00 },\n    { \"descricao\": \"Criação de conteúdo\", \"quantidade\": 4, \"valor_unitario\": 350.00 },\n    { \"descricao\": \"Manutenção de site\", \"quantidade\": 1, \"valor_unitario\": 800.00 }\n  ]\n}"
+            },
+            "description": "O valor total do contrato é sempre calculado pelos itens — nunca salvo diretamente."
+          }
+        },
+        {
+          "name": "Ver contrato",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/contratos/1",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Accept", "value": "application/json" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ordens de Serviço",
+      "item": [
+        {
+          "name": "Listar ordens de serviço",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/ordens-servico",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Accept", "value": "application/json" }]
+          }
+        },
+        {
+          "name": "Criar ordem de serviço",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/ordens-servico",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contrato_id\": 1,\n  \"responsavel_id\": 3,\n  \"titulo\": \"Produção de conteúdo — Abril 2025\",\n  \"descricao\": \"Criação de 12 posts para redes sociais.\",\n  \"horas_estimadas\": 16\n}"
+            }
+          }
+        },
+        {
+          "name": "Ver OS com histórico",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/ordens-servico/1",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Accept", "value": "application/json" }],
+            "description": "Retorna a OS com histórico completo de mudanças de status (quem mudou, quando, de qual para qual)."
+          }
+        },
+        {
+          "name": "Mudar status da OS (com auditoria)",
+          "request": {
+            "method": "PATCH",
+            "url": "{{base_url}}/ordens-servico/1/status",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"em_andamento\",\n  \"observacao\": \"Iniciando produção dos conteúdos.\"\n}"
+            },
+            "description": "Registra automaticamente em historico_status_ordens: quem mudou, quando, status anterior e novo."
+          }
+        }
+      ]
+    }
+  ]
+}

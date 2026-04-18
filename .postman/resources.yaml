@@ -1,0 +1,7 @@
+# Use this workspace to collaborate
+workspace:
+  id: 1f2b75dc-2989-434e-8b76-b7574f6f69e7
+
+localResources:
+  collections:
+    - ..\agency-system-tecnical-test.postman_collection.json
