@@ -40,15 +40,13 @@ class CobrancaTest extends TestCase
         ], $attrs));
     }
 
-    /** @test */
-    public function listar_cobrancas_requer_autenticacao(): void
+    public function test_listar_cobrancas_requer_autenticacao(): void
     {
         $this->getJson('/api/v1/cobrancas')
             ->assertStatus(401);
     }
 
-    /** @test */
-    public function usuario_autenticado_pode_listar_cobrancas(): void
+    public function test_usuario_autenticado_pode_listar_cobrancas(): void
     {
         $this->criarCobranca();
 
@@ -58,8 +56,7 @@ class CobrancaTest extends TestCase
             ->assertJsonStructure(['data']);
     }
 
-    /** @test */
-    public function pode_filtrar_cobrancas_por_status(): void
+    public function test_pode_filtrar_cobrancas_por_status(): void
     {
         $this->criarCobranca(['status' => StatusCobranca::PENDENTE]);
         $this->criarCobranca(['status' => StatusCobranca::PAGO]);
@@ -73,8 +70,7 @@ class CobrancaTest extends TestCase
         }
     }
 
-    /** @test */
-    public function pode_filtrar_por_multiplos_status(): void
+    public function test_pode_filtrar_por_multiplos_status(): void
     {
         $this->criarCobranca(['status' => StatusCobranca::PENDENTE]);
         $this->criarCobranca(['status' => StatusCobranca::PAGO]);
@@ -89,8 +85,7 @@ class CobrancaTest extends TestCase
         $this->assertEquals(['pago', 'pendente'], $statuses);
     }
 
-    /** @test */
-    public function transicao_invalida_retorna_422(): void
+    public function test_transicao_invalida_retorna_422(): void
     {
         $cobranca = $this->criarCobranca(['status' => StatusCobranca::PAGO]);
 
@@ -102,8 +97,7 @@ class CobrancaTest extends TestCase
             ->assertJsonFragment(['message' => 'Transição inválida: não é possível mudar de [pago] para [pendente].']);
     }
 
-    /** @test */
-    public function cancelamento_sem_motivo_retorna_erro(): void
+    public function test_cancelamento_sem_motivo_retorna_erro(): void
     {
         $cobranca = $this->criarCobranca(['status' => StatusCobranca::PENDENTE]);
 
@@ -115,8 +109,7 @@ class CobrancaTest extends TestCase
             ->assertStatus(422);
     }
 
-    /** @test */
-    public function cancelamento_com_motivo_funciona(): void
+    public function test_cancelamento_com_motivo_funciona(): void
     {
         $cobranca = $this->criarCobranca(['status' => StatusCobranca::PENDENTE]);
 
@@ -129,8 +122,7 @@ class CobrancaTest extends TestCase
             ->assertJsonFragment(['status' => StatusCobranca::CANCELADO]);
     }
 
-    /** @test */
-    public function ordenacao_por_campo_nao_permitido_e_ignorada_sem_erro(): void
+    public function test_ordenacao_por_campo_nao_permitido_e_ignorada_sem_erro(): void
     {
         $this->actingAs($this->user)
             ->getJson('/api/v1/cobrancas?order_by=password')

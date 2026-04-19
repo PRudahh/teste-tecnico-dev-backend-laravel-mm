@@ -8,8 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class StatusCobrancaTest extends TestCase
 {
-    /** @test */
-    public function transicao_valida_nao_lanca_excecao(): void
+    public function test_transicao_valida_nao_lanca_excecao(): void
     {
         $this->expectNotToPerformAssertions();
 
@@ -19,8 +18,7 @@ class StatusCobrancaTest extends TestCase
         );
     }
 
-    /** @test */
-    public function transicao_invalida_lanca_domain_exception(): void
+    public function test_transicao_invalida_lanca_domain_exception(): void
     {
         $this->expectException(DomainException::class);
         $this->expectExceptionMessageMatches('/Transição inválida/');
@@ -31,38 +29,33 @@ class StatusCobrancaTest extends TestCase
         );
     }
 
-    /** @test */
-    public function pago_e_status_terminal_sem_transicoes(): void
+    public function test_pago_e_status_terminal_sem_transicoes(): void
     {
         $this->expectException(DomainException::class);
 
         StatusCobranca::validarTransicao(StatusCobranca::PAGO, StatusCobranca::CANCELADO);
     }
 
-    /** @test */
-    public function cancelado_e_status_terminal(): void
+    public function test_cancelado_e_status_terminal(): void
     {
         $this->expectException(DomainException::class);
 
         StatusCobranca::validarTransicao(StatusCobranca::CANCELADO, StatusCobranca::PENDENTE);
     }
 
-    /** @test */
-    public function pendente_pode_ir_para_aguardando_pagamento(): void
+    public function test_pendente_pode_ir_para_aguardando_pagamento(): void
     {
         $this->expectNotToPerformAssertions();
         StatusCobranca::validarTransicao(StatusCobranca::PENDENTE, StatusCobranca::AGUARDANDO_PAGAMENTO);
     }
 
-    /** @test */
-    public function aguardando_pagamento_pode_ir_para_inadimplente(): void
+    public function test_aguardando_pagamento_pode_ir_para_inadimplente(): void
     {
         $this->expectNotToPerformAssertions();
         StatusCobranca::validarTransicao(StatusCobranca::AGUARDANDO_PAGAMENTO, StatusCobranca::INADIMPLENTE);
     }
 
-    /** @test */
-    public function cancelamento_exige_transicao_valida_antes(): void
+    public function test_cancelamento_exige_transicao_valida_antes(): void
     {
         $this->expectException(DomainException::class);
 
@@ -70,8 +63,7 @@ class StatusCobrancaTest extends TestCase
         StatusCobranca::validarTransicao(StatusCobranca::PAGO, StatusCobranca::CANCELADO);
     }
 
-    /** @test */
-    public function whitelist_de_ordenacao_contem_campos_esperados(): void
+    public function test_whitelist_de_ordenacao_contem_campos_esperados(): void
     {
         $whitelist = StatusCobranca::ordenaveisWhitelist();
 

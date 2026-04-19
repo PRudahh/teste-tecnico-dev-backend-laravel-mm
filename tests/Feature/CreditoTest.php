@@ -13,8 +13,7 @@ class CreditoTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
-    public function usuario_sem_role_financeiro_nao_pode_aplicar_credito(): void
+    public function test_usuario_sem_role_financeiro_nao_pode_aplicar_credito(): void
     {
         $operacional = User::factory()->create(['role' => 'operacional']);
         $cliente     = Cliente::factory()->create();
@@ -24,8 +23,7 @@ class CreditoTest extends TestCase
             ->assertStatus(403);
     }
 
-    /** @test */
-    public function valor_negativo_retorna_422(): void
+    public function test_valor_negativo_retorna_422(): void
     {
         $financeiro = User::factory()->create(['role' => 'financeiro']);
         $cliente    = Cliente::factory()->create();
@@ -35,8 +33,7 @@ class CreditoTest extends TestCase
             ->assertStatus(422);
     }
 
-    /** @test */
-    public function valor_zero_retorna_422(): void
+    public function test_valor_zero_retorna_422(): void
     {
         $financeiro = User::factory()->create(['role' => 'financeiro']);
         $cliente    = Cliente::factory()->create();
@@ -46,8 +43,7 @@ class CreditoTest extends TestCase
             ->assertStatus(422);
     }
 
-    /** @test */
-    public function financeiro_pode_aplicar_credito_e_saldo_e_atualizado(): void
+    public function test_financeiro_pode_aplicar_credito_e_saldo_e_atualizado(): void
     {
         Queue::fake();
 
@@ -65,8 +61,7 @@ class CreditoTest extends TestCase
         ]);
     }
 
-    /** @test */
-    public function aplicar_credito_dispara_job_assincrono(): void
+    public function test_aplicar_credito_dispara_job_assincrono(): void
     {
         Queue::fake();
 
@@ -81,8 +76,7 @@ class CreditoTest extends TestCase
         });
     }
 
-    /** @test */
-    public function admin_tambem_pode_aplicar_credito(): void
+    public function test_admin_tambem_pode_aplicar_credito(): void
     {
         Queue::fake();
 
